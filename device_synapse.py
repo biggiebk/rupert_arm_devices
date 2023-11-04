@@ -3,7 +3,7 @@ Description: Contains audio modules
 """
 import json
 from beartype import beartype
-from rupert_arm_devices.tuya import Outlet
+from rupert_arm_devices.tuya import DeviceController
 from rupert.shared.synapse import Synapse
 
 class RupertDeviceSynapse(Synapse):
@@ -30,7 +30,6 @@ class RupertDeviceSynapse(Synapse):
 		"""
 		control_dict = json.loads(consumer_message.value().decode("utf-8"))
 		if control_dict['event_type'] == 'control':
-			device = Outlet()
-			device.set_status(control_dict)
+			DeviceController(control_dict)
 		elif control_dict['event_type'] == 'status':
 			pass
