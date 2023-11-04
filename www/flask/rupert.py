@@ -10,12 +10,12 @@ app = Flask(__name__)
 def flip(name):
   control_dictionary = { "event_type": "control", "name": escape(name), "on_off": None, "return_topic": "debug_topic"}
   kafka_producer = Synapse('/web/cfg/settings.json')
-  kafka_producer.send("bedroom_audio_alpha",json.dumps(control_dictionary))
+  kafka_producer.send("devcies_alpha",json.dumps(control_dictionary))
   return f"Device: {escape(name)} Flip"
 
 @app.route("/device/<name>/<power>")
 def power(name, power):
   control_dictionary =  { "event_type": "control", "name": escape(name), "on_off": escape(power), "return_topic": "debug_topic"}
   kafka_producer = Synapse('/web/cfg/settings.json')
-  kafka_producer.send("devices_alpha",json.dumps(control_dictionary))
+  kafka_producer.send("devcies_alpha",json.dumps(control_dictionary))
   return f"Device: {escape(name)} Power: {escape(power)}"

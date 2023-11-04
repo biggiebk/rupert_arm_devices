@@ -37,22 +37,18 @@ class Outlet():
 		Set the status of a light. Requires:
 			power = boolean value for on (True), off (False), None (Flip)
 		"""
-		with open("devices.json", 'r', encoding='utf-8') as settings:
-			settings_json = settings.read()
-		settings = json.loads(settings_json)
+		with open("cfg/tuyaDevices.json", 'r', encoding='utf-8') as devices_file:
+			devices_json = devices_file.read()
+		devices = json.loads(devices_json)
 
-		for device in settings:
-			if device['name'] == control_dictionary['name']:
-				self.tiny_tuya = tinytuya.OutletDevice(device['id'], device['ip'], device['key'])
+		if control_dictionary['name'] in devices:
+				self.tiny_tuya = tinytuya.OutletDevice(devices[control_dictionary['name']]['id'], devices[control_dictionary['name']]['ip'], devices[control_dictionary['name']]['key'])
 				version = 3.3
-				if "version" in control_dictionary:
-					versions = control_dictionary['version']
-				self.tiny_tuya.set_version(version)
-				status = self.tiny_tuya.status()
-				break
+		else:
+			print(f"{control_dictionary['name']} unknown device name")
+			return
 
 		if control_dictionary['on_off'] == None:
 			self.flip()
 		else:
 			self.on_off(control_dictionary['on_off'])
-			
