@@ -58,7 +58,7 @@ class Outlet():
 		Set the status of a light. Requires:
 			power = boolean value for on (True), off (False), None (Flip)
 		"""
-		with open("cfg/tuyaDevices.json", 'r', encoding='utf-8') as devices_file:
+		with open("tuyaDevices.json", 'r', encoding='utf-8') as devices_file:
 			devices_json = devices_file.read()
 		devices = json.loads(devices_json)
 
@@ -126,7 +126,7 @@ class Light():
 		Set the status of a light. Requires:
 			power = boolean value for on (True), off (False), None (Flip)
 		"""
-		with open("cfg/tuyaDevices.json", 'r', encoding='utf-8') as devices_file:
+		with open("tuyaDevices.json", 'r', encoding='utf-8') as devices_file:
 			devices_json = devices_file.read()
 		devices = json.loads(devices_json)
 
