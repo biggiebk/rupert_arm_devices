@@ -48,7 +48,7 @@ class Outlet():
 		Power on or off a light. Requires:
 			power = boolean value for on (True) or off (False)
 		"""
-		if eval(power):
+		if eval(f"{power}"):
 			self.tiny_tuya.turn_on()
 		else:
 			self.tiny_tuya.turn_off()
@@ -145,7 +145,7 @@ class Light():
 			# If light is powered on configure colors and brightness light
 			if eval(f"control_dictionary['on_off']"): # Convert to boolean, however also accept as boolean.
 				if control_dictionary['red'] == 0 and control_dictionary['green'] == 0 and control_dictionary['blue'] == 0:
-					self.tiny_tuya.set_white(255, control_dictionary['brightness_level'])
+					self.tiny_tuya.set_white(1000, control_dictionary['brightness_level'])
 				else:
 					self.color_rgb(control_dictionary['red'], control_dictionary['green'], control_dictionary['blue'])
 					self.brightness(brightness_level=control_dictionary['brightness_level'])
