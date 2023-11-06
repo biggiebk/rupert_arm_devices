@@ -133,6 +133,7 @@ class Light():
 		if control_dictionary['name'] in devices:
 				self.tiny_tuya = tinytuya.BulbDevice(devices[control_dictionary['name']]['id'], devices[control_dictionary['name']]['ip'], devices[control_dictionary['name']]['key'])
 				self.tiny_tuya.set_version(float(devices[control_dictionary['name']]['version']))
+				self.tiny_tuya.set_socketPersistent(True)
 		else:
 			print(f"{control_dictionary['name']} unknown device name")
 			return
@@ -141,11 +142,10 @@ class Light():
 			self.flip()
 		else:
 			self.on_off(control_dictionary['on_off'])
-
 			# If light is powered on configure colors and brightness light
 			if eval(f"control_dictionary['on_off']"): # Convert to boolean, however also accept as boolean.
 				if control_dictionary['red'] == 0 and control_dictionary['green'] == 0 and control_dictionary['blue'] == 0:
-					self.tiny_tuya.set_white(1000, control_dictionary['brightness_level'])
+					self.tiny_tuya.set_white( control_dictionary['brightness_level'],1000)
 				else:
 					self.color_rgb(control_dictionary['red'], control_dictionary['green'], control_dictionary['blue'])
 					self.brightness(brightness_level=control_dictionary['brightness_level'])
