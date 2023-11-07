@@ -145,7 +145,8 @@ class Light():
 			# If light is powered on configure colors and brightness light
 			if eval(f"control_dictionary['on_off']"): # Convert to boolean, however also accept as boolean.
 				if control_dictionary['red'] == 0 and control_dictionary['green'] == 0 and control_dictionary['blue'] == 0:
-					self.tiny_tuya.set_white( control_dictionary['brightness_level'],1000)
+					self.tiny_tuya.set_white( control_dictionary['brightness_level'], control_dictionary['colour_temp'])
 				else:
-					self.color_rgb(control_dictionary['red'], control_dictionary['green'], control_dictionary['blue'])
+					if not (control_dictionary['red'] == -1 and control_dictionary['green'] == -1 and control_dictionary['blue'] == -1):
+						self.color_rgb(control_dictionary['red'], control_dictionary['green'], control_dictionary['blue'])
 					self.brightness(brightness_level=control_dictionary['brightness_level'])
