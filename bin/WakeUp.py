@@ -1,6 +1,5 @@
 #!/usr/bin/env python3.11
 import time
-import os
 import json
 from rupert.shared.synapse import Synapse
 
