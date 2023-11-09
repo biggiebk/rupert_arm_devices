@@ -1,4 +1,3 @@
-
 @app.route("/device/<name>/flip")
 def flip(name):
   control_dictionary = { "event_type": "control", "name": escape(name), "on_off": None, "return_topic": "debug_topic"}
@@ -19,3 +18,8 @@ def light(name, power, red, green, blue, brightness_level):
   kafka_producer = Synapse('/web/cfg/settings.json')
   kafka_producer.send("devcies_alpha",json.dumps(control_dictionary))
   return f"Device: {escape(name)} Power: {escape(power)} Red {escape(red)} Green {escape(green)} Blue {escape(blue)} Brightness_level {escape(brightness_level)}"
+
+@app.route("/light/sleep")
+def sleep(name):
+  os.system('nohup /web/bin/Sleep.py &')
+  return f"Sleeping"
