@@ -181,6 +181,19 @@ class Light():
 			power = boolean value for on (True), off (False), None (Flip)
 		"""
 		print(f"  - set: {control_dictionary} for {self.name}")
+		try:
+			self.__set_status(control_dictionary)
+		except Exception as e:
+			print(e)
+			print("If at first you don't succeed try again")
+			self.tiny_tuya = tinytuya.BulbDevice(self.settings['id'], self.settings['ip'], self.settings['key'])
+			self.tiny_tuya.set_version(float(self.settings['version']))
+			self.tiny_tuya.set_socketPersistent(True)
+			self.tiny_tuya.set_socketRetryLimit(1)
+			self.__set_status(control_dictionary)
+
+## Private Classes
+	def __set_status(self, control_dictionary):
 		if 'cycle' in control_dictionary:
 			print("  - cycle found for {self.name}")
 			rgb = {"red": control_dictionary['red'], "green": control_dictionary['green'], "blue": control_dictionary['blue']}
@@ -198,7 +211,7 @@ class Light():
 						self.color_rgb(control_dictionary['red'], control_dictionary['green'], control_dictionary['blue'])
 					self.brightness(brightness_level=control_dictionary['brightness_level'])
 
-## Private Classes
+
 
 	def __descend(self, seconds, initial, end, inc, rgb):
 		# Calculate
