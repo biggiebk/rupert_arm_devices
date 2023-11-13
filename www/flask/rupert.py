@@ -20,6 +20,8 @@ def light(name, power, red, green, blue, brightness_level):
   return f"Device: {escape(name)} Power: {escape(power)} Red {escape(red)} Green {escape(green)} Blue {escape(blue)} Brightness_level {escape(brightness_level)}"
 
 @app.route("/light/sleep")
-def sleep(name):
-  os.system('nohup /web/bin/Sleep.py &')
+def sleep():
+  control_dictionary = { "event_type": "control", "name": "Bedroom Light", "cycle": "descend", "red": 0, "green": 0, "blue": 255, "seconds": 600, "initial": 100, "increment": 10, "return_topic": "debug_topic"}
+  kafka_producer = Synapse('/web/cfg/settings.json')
+  kafka_producer.send("devcies_alpha",json.dumps(control_dictionary))
   return f"Sleeping"
