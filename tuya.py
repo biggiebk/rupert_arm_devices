@@ -2,6 +2,7 @@
 Description: Module for Tuya Devices.
 """
 import time
+import colorsys
 import json
 import tinytuya
 
@@ -65,34 +66,6 @@ class Outlet():
 		else:
 			self.tiny_tuya.turn_off()
 
-	def run(self, in_queue):
-		status_time = time.time() + 30
-		heartbeat_time = time.time() + 10
-		while(True):
-			while(True):
-				if time.time() >= status_time:
-					status = self.tiny_tuya.status()
-					status_time = time.time() + 30
-					heartbeat_time = time.time() + 10
-				elif time.time() >= heartbeat_time:
-					payload = self.tiny_tuya.generate_payload(tinytuya.HEART_BEAT)
-					status = self.tiny_tuya.send(payload)
-					heartbeat_time = time.time() + 10
-				else:
-					status = self.tiny_tuya.receive()
-				
-				if not status:
-					continue
-				elif "Error" in status:
-					self.tiny_tuya = tinytuya.BulbDevice(self.settings['id'], self.settings['ip'], self.settings['key'])
-					self.tiny_tuya.set_version(float(self.settings['version']))
-					self.tiny_tuya.set_socketPersistent(True)
-					self.tiny_tuya.set_socketRetryLimit(1)
-				else:
-					break
-			
-			self.set_status(in_queue.get())
-
 	def set_status(self, control_dictionary):
 		"""
 		Set the status of a light. Requires:
@@ -102,7 +75,6 @@ class Outlet():
 			self.flip()
 		else:
 			self.on_off(control_dictionary['on_off'])
-
 
 class Light():
 	"""
@@ -131,6 +103,16 @@ class Light():
 		print(f"  - brightness to {brightness_level} on {self.name}")
 		self.tiny_tuya.set_brightness(brightness_level)
 
+	def color_hsv(self, hue, saturation, value):
+		"""
+		Set color using RGB
+			red = number value for level of red
+			green = number value for level of green
+			blue = number value for level of blue
+		"""
+		print(f"  - HSV: {hue} {saturation} {value}")
+		self.tiny_tuya.set_hsv(hue, saturation, value)
+
 	def color_rgb(self, red, green, blue):
 		"""
 		Set color using RGB
@@ -156,34 +138,15 @@ class Light():
 		else:
 			self.tiny_tuya.turn_off()
 
-
-	def run(self, in_queue):
-		heartbeat_time = time.time() + 10
-		while(True):
-			while(True):
-				if time.time() >= heartbeat_time:
-					payload = self.tiny_tuya.generate_payload(tinytuya.HEART_BEAT)
-					status = self.tiny_tuya.send(payload)
-					print(f"Hearbeat: {status}")
-					heartbeat_time = time.time() + 10
-				break
-			print("  - Check Queue")
-			control_dictionary = in_queue.get()
-			try:
-				self.set_status(control_dictionary)
-			except Exception as e:
-				print("Dude it like broke... trying again")
-				self.set_status(control_dictionary)
-
 	def set_status(self, control_dictionary):
 		"""
 		Set the status of a light. Requires:
 			power = boolean value for on (True), off (False), None (Flip)
 		"""
 		print(f"  - set: {control_dictionary} for {self.name}")
-		try:
+		try: # Required to capture random KeyError: '24' and try again. Possible connectivity hicup? 
 			self.__set_status(control_dictionary)
-		except Exception as e:
+		except Exception as e: # A simple retry fails, so pretty much start from stratch and try again.
 			print(e)
 			print("If at first you don't succeed try again")
 			self.tiny_tuya = tinytuya.BulbDevice(self.settings['id'], self.settings['ip'], self.settings['key'])
@@ -196,27 +159,29 @@ class Light():
 	def __set_status(self, control_dictionary):
 		if 'cycle' in control_dictionary:
 			print("  - cycle found for {self.name}")
-			rgb = {"red": control_dictionary['red'], "green": control_dictionary['green'], "blue": control_dictionary['blue']}
-			self.__descend(control_dictionary['seconds'], control_dictionary['initial'], 0, control_dictionary['increment'], rgb)
+			self.__descend(control_dictionary['seconds'], control_dictionary['initial'], 0, control_dictionary['increment'], control_dictionary['red'], control_dictionary['green'], control_dictionary['blue'])
 		elif control_dictionary['on_off'] == None: # If value is None Flip from current status
 			self.flip()
 		else:
 			self.on_off(control_dictionary['on_off'])
 			# If light is powered on configure colors and brightness light
-			if eval(f"control_dictionary['on_off']"): # Convert to boolean, however also accept as boolean.
-				if control_dictionary['red'] == 255 and control_dictionary['green'] == 255 and control_dictionary['blue'] == 255:
-					self.tiny_tuya.set_white( control_dictionary['brightness_level'], control_dictionary['colour_temp'])
-				else:
-					if not (control_dictionary['red'] == -1 and control_dictionary['green'] == -1 and control_dictionary['blue'] == -1):
-						self.color_rgb(control_dictionary['red'], control_dictionary['green'], control_dictionary['blue'])
-					self.brightness(brightness_level=control_dictionary['brightness_level'])
+			if all(key in control_dictionary for key in ('red', 'green', 'blue')):
+				if eval(f"control_dictionary['on_off']"): # Convert to boolean, however also accept as boolean.
+					if control_dictionary['red'] == 255 and control_dictionary['green'] == 255 and control_dictionary['blue'] == 255:
+						self.tiny_tuya.set_white( control_dictionary['brightness_level'], control_dictionary['colour_temp'])
+				elif not (control_dictionary['red'] == -1 and control_dictionary['green'] == -1 and control_dictionary['blue'] == -1):
+					hue, saturation, value = colorsys.rgb_to_hsv(control_dictionary['red']/255.0, control_dictionary['green']/255.0, control_dictionary['blue']/255.0)
+					self.color_hsv(hue, saturation, value)
+				self.brightness(brightness_level=control_dictionary['brightness_level'])
+			else:
+				if all(key in control_dictionary for key in ('hue', 'saturation', 'value')):
+					self.color_hsv(control_dictionary['hue'], control_dictionary['saturation'], control_dictionary['value'])
 
-
-
-	def __descend(self, seconds, initial, end, inc, rgb):
+	def __descend(self, seconds, initial, end, inc, red, green, blue):
 		# Calculate
 		sleep = seconds / (initial / inc)
-		self.set_status({ "event_type": "control", "name": "Bedroom Light", "on_off": True, "red": rgb['red'], "green": rgb['green'], "blue": rgb['blue'], "brightness_level":  initial, "return_topic": "debug_topic"})
+		hue, saturation, value = colorsys.rgb_to_hsv(red/255.0, green/255.0, blue/255.0)
+		self.set_status({ "event_type": "control", "name": "Bedroom Light", "on_off": True, "hue": hue, "saturation": saturation, "value": value, "brightness_level":  initial, "return_topic": "debug_topic"})
 		time.sleep(sleep)
 		# Loop
 		for count in range(10, 1000, 10):
