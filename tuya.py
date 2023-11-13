@@ -164,7 +164,9 @@ class Light():
 			self.flip()
 		else:
 			self.on_off(control_dictionary['on_off'])
-			# If light is powered on configure colors and brightness light
+			# If light is powered off return
+			if not control_dictionary['on_off']:
+				return
 			if all(key in control_dictionary for key in ('red', 'green', 'blue')):
 				if eval(f"control_dictionary['on_off']"): # Convert to boolean, however also accept as boolean.
 					if control_dictionary['red'] == 255 and control_dictionary['green'] == 255 and control_dictionary['blue'] == 255:
@@ -180,13 +182,17 @@ class Light():
 	def __descend(self, seconds, initial, end, inc, red, green, blue):
 		# Calculate
 		sleep = seconds / (initial / inc)
+		brightness = initial / 100
+		increment = inc / 100
+		print(f"sleep {sleep} brightness {brightness} increment {increment}")
+
 		hue, saturation, value = colorsys.rgb_to_hsv(red/255.0, green/255.0, blue/255.0)
-		self.set_status({ "event_type": "control", "name": "Bedroom Light", "on_off": True, "hue": hue, "saturation": saturation, "value": value, "brightness_level":  initial, "return_topic": "debug_topic"})
+		self.set_status({ "event_type": "control", "name": "Bedroom Light", "on_off": True, "hue": hue, "saturation": saturation, "value": value, "brightness_level":  brightness, "return_topic": "debug_topic"})
 		time.sleep(sleep)
 		# Loop
-		for count in range(10, 1000, 10):
+		for count in range(1, initial, inc):
 			print(f"  - Counter for {initial - count} for {self.name}")
-			self.set_status({ "event_type": "control", "name": "Bedroom Light", "on_off": True, "red": -1, "green": -1, "blue": -1, "brightness_level":  initial - count, "return_topic": "debug_topic"})
+			self.set_status({ "event_type": "control", "name": "Bedroom Light", "on_off": True, "hue": hue, "saturation": saturation, "value": brightness - (count * increment), "brightness_level":  (count * increment), "return_topic": "debug_topic"})
 			time.sleep(sleep)
 		# Turn off the light
-		self.set_status({ "event_type": "control", "name": "Bedroom Light", "on_off": False, "red": rgb['red'], "green": rgb['green'], "blue": rgb['blue'], "brightness_level":  initial, "return_topic": "debug_topic"})
+		self.set_status({ "event_type": "control", "name": "Bedroom Light", "on_off": False, "red": -1, "green": -1, "blue": -1, "brightness_level":  0, "return_topic": "debug_topic"})
