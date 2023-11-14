@@ -27,7 +27,7 @@ def sleep():
   return f"Sleeping"
 
 @app.route("/light/wakeup")
-def sleep():
+def wakeup():
   control_dictionary = { "event_type": "control", "name": "Bedroom Light", "cycle": "ascend", "red": 255, "green": 42, "blue": 0, "seconds": 600, "initial": 1, "increment": 1, "return_topic": "debug_topic"}
   kafka_producer = Synapse('/web/cfg/settings.json')
   kafka_producer.send("devcies_alpha",json.dumps(control_dictionary))
