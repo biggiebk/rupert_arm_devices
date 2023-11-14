@@ -21,7 +21,14 @@ def light(name, power, red, green, blue, brightness_level):
 
 @app.route("/light/sleep")
 def sleep():
-  control_dictionary = { "event_type": "control", "name": "Bedroom Light", "cycle": "descend", "red": 0, "green": 0, "blue": 255, "seconds": 600, "initial": 100, "increment": 10, "return_topic": "debug_topic"}
+  control_dictionary = { "event_type": "control", "name": "Bedroom Light", "cycle": "descend", "red": 0, "green": 0, "blue": 255, "seconds": 600, "initial": 100, "increment": 1, "return_topic": "debug_topic"}
+  kafka_producer = Synapse('/web/cfg/settings.json')
+  kafka_producer.send("devcies_alpha",json.dumps(control_dictionary))
+  return f"Sleeping"
+
+@app.route("/light/wakeup")
+def sleep():
+  control_dictionary = { "event_type": "control", "name": "Bedroom Light", "cycle": "ascend", "red": 255, "green": 42, "blue": 0, "seconds": 600, "initial": 1, "increment": 1, "return_topic": "debug_topic"}
   kafka_producer = Synapse('/web/cfg/settings.json')
   kafka_producer.send("devcies_alpha",json.dumps(control_dictionary))
   return f"Sleeping"

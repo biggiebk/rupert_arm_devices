@@ -156,10 +156,48 @@ class Light():
 			self.__set_status(control_dictionary)
 
 ## Private Classes
+	def __ascend(self, seconds, initial, end, inc, red, green, blue):
+		# Calculate
+		sleep = seconds / (100 / inc)
+		start = end / 100
+		increment = inc / 100
+		print(f"  - ASCENDING: sleep {sleep} start {start} increment {increment}")
+
+		hue, saturation, value = colorsys.rgb_to_hsv(red/255.0, green/255.0, blue/255.0)
+		self.set_status({ "event_type": "control", "name": "Bedroom Light", "on_off": True, "hue": hue, "saturation": saturation, "value": start, "brightness_level":  start, "return_topic": "debug_topic"})
+		print(f"Before Sleep {sleep}")
+		time.sleep(sleep)
+		# Loop
+		for count in range(1, 100, inc):
+			print(f"  - Counter for {start + (count * increment)} for {self.name}")
+			self.set_status({ "event_type": "control", "name": "Bedroom Light", "on_off": True, "hue": hue, "saturation": saturation, "value": start + (count * increment), "brightness_level":  (count * increment), "return_topic": "debug_topic"})
+			time.sleep(sleep)
+
+	def __descend(self, seconds, initial, end, inc, red, green, blue):
+		# Calculate
+		sleep = seconds / (initial / inc)
+		brightness = initial / 100
+		increment = inc / 100
+		print(f"  - DESCENDING: sleep {sleep} brightness {brightness} increment {increment}")
+
+		hue, saturation, value = colorsys.rgb_to_hsv(red/255.0, green/255.0, blue/255.0)
+		self.set_status({ "event_type": "control", "name": "Bedroom Light", "on_off": True, "hue": hue, "saturation": saturation, "value": value, "brightness_level":  brightness, "return_topic": "debug_topic"})
+		time.sleep(sleep)
+		# Loop
+		for count in range(1, initial, inc):
+			print(f"  - Counter for {initial - count} for {self.name}")
+			self.set_status({ "event_type": "control", "name": "Bedroom Light", "on_off": True, "hue": hue, "saturation": saturation, "value": brightness - (count * increment), "brightness_level":  (count * increment), "return_topic": "debug_topic"})
+			time.sleep(sleep)
+		# Turn off the light
+		self.set_status({ "event_type": "control", "name": "Bedroom Light", "on_off": False, "red": -1, "green": -1, "blue": -1, "brightness_level":  0, "return_topic": "debug_topic"})
+
 	def __set_status(self, control_dictionary):
 		if 'cycle' in control_dictionary:
-			print("  - cycle found for {self.name}")
-			self.__descend(control_dictionary['seconds'], control_dictionary['initial'], 0, control_dictionary['increment'], control_dictionary['red'], control_dictionary['green'], control_dictionary['blue'])
+			print(f"  - cycle found for {self.name}")
+			if "descend" == control_dictionary['cycle']:
+				self.__descend(control_dictionary['seconds'], control_dictionary['initial'], 0, control_dictionary['increment'], control_dictionary['red'], control_dictionary['green'], control_dictionary['blue'])
+			elif "ascend" == control_dictionary['cycle']:
+				self.__ascend(control_dictionary['seconds'], 100, control_dictionary['initial'], control_dictionary['increment'], control_dictionary['red'], control_dictionary['green'], control_dictionary['blue'])
 		elif control_dictionary['on_off'] == None: # If value is None Flip from current status
 			self.flip()
 		else:
@@ -178,21 +216,3 @@ class Light():
 			else:
 				if all(key in control_dictionary for key in ('hue', 'saturation', 'value')):
 					self.color_hsv(control_dictionary['hue'], control_dictionary['saturation'], control_dictionary['value'])
-
-	def __descend(self, seconds, initial, end, inc, red, green, blue):
-		# Calculate
-		sleep = seconds / (initial / inc)
-		brightness = initial / 100
-		increment = inc / 100
-		print(f"sleep {sleep} brightness {brightness} increment {increment}")
-
-		hue, saturation, value = colorsys.rgb_to_hsv(red/255.0, green/255.0, blue/255.0)
-		self.set_status({ "event_type": "control", "name": "Bedroom Light", "on_off": True, "hue": hue, "saturation": saturation, "value": value, "brightness_level":  brightness, "return_topic": "debug_topic"})
-		time.sleep(sleep)
-		# Loop
-		for count in range(1, initial, inc):
-			print(f"  - Counter for {initial - count} for {self.name}")
-			self.set_status({ "event_type": "control", "name": "Bedroom Light", "on_off": True, "hue": hue, "saturation": saturation, "value": brightness - (count * increment), "brightness_level":  (count * increment), "return_topic": "debug_topic"})
-			time.sleep(sleep)
-		# Turn off the light
-		self.set_status({ "event_type": "control", "name": "Bedroom Light", "on_off": False, "red": -1, "green": -1, "blue": -1, "brightness_level":  0, "return_topic": "debug_topic"})
