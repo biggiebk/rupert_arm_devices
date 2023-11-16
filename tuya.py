@@ -207,12 +207,16 @@ class Light():
 				return
 			if all(key in control_dictionary for key in ('red', 'green', 'blue')):
 				if eval(f"control_dictionary['on_off']"): # Convert to boolean, however also accept as boolean.
-					if control_dictionary['red'] == 255 and control_dictionary['green'] == 255 and control_dictionary['blue'] == 255:
+					print("on_off = true")
+					if (control_dictionary['red'] == 255 and control_dictionary['green'] == 255 and control_dictionary['blue'] == 255):
+						print("Regular")
 						self.tiny_tuya.set_white( control_dictionary['brightness_level'], control_dictionary['colour_temp'])
-				elif not (control_dictionary['red'] == -1 and control_dictionary['green'] == -1 and control_dictionary['blue'] == -1):
-					hue, saturation, value = colorsys.rgb_to_hsv(control_dictionary['red']/255.0, control_dictionary['green']/255.0, control_dictionary['blue']/255.0)
-					self.color_hsv(hue, saturation, value)
-				self.brightness(brightness_level=control_dictionary['brightness_level'])
+					elif not (control_dictionary['red'] == -1 and control_dictionary['green'] == -1 and control_dictionary['blue'] == -1):
+						hue, saturation, value = colorsys.rgb_to_hsv(control_dictionary['red']/255.0, control_dictionary['green']/255.0, control_dictionary['blue']/255.0)
+						print("convert")
+						self.color_hsv(hue, saturation, value)
+					else:
+						self.brightness(brightness_level=control_dictionary['brightness_level'])
 			else:
 				if all(key in control_dictionary for key in ('hue', 'saturation', 'value')):
 					self.color_hsv(control_dictionary['hue'], control_dictionary['saturation'], control_dictionary['value'])
