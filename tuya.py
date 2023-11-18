@@ -156,48 +156,48 @@ class Light():
 			self.__set_status(control_dictionary)
 
 ## Private Classes
-	def __ascend(self, seconds, initial, end, inc, red, green, blue):
-		# Calculate
-		sleep = seconds / (100 / inc)
-		start = end / 100
-		increment = inc / 100
-		print(f"  - ASCENDING: sleep {sleep} start {start} increment {increment}")
-
+	def __ascend(self, duration, increment, red, green, blue):
 		hue, saturation, value = colorsys.rgb_to_hsv(red/255.0, green/255.0, blue/255.0)
-		self.set_status({ "event_type": "control", "name": "Bedroom Light", "on_off": True, "hue": hue, "saturation": saturation, "value": start, "brightness_level":  start, "return_topic": "debug_topic"})
-		print(f"Before Sleep {sleep}")
-		time.sleep(sleep)
+		loop = round(value * 100/increment)
+		sleep = duration / loop
+		print(f"  - Ascending: End Value: {value} Loop: {loop}, Inc: {increment} Sleep: {sleep}")
 		# Loop
-		for count in range(1, 100, inc):
-			print(f"  - Counter for {start + (count * increment)} for {self.name}")
-			self.set_status({ "event_type": "control", "name": "Bedroom Light", "on_off": True, "hue": hue, "saturation": saturation, "value": start + (count * increment), "brightness_level":  (count * increment), "return_topic": "debug_topic"})
+		for count in range(1, loop, 1):
+			print("\n---Next Cycle---")
+			print(f"  - Counter for {count} for {self.name}")
+			self.set_status({ "event_type": "control", "name": "Bedroom Light", "on_off": True, "hue": hue, "saturation": saturation, "value": round((increment / 100) * (count), 2), "return_topic": "debug_topic"})
 			time.sleep(sleep)
+		print("  - Last one")
+		self.set_status({ "event_type": "control", "name": "Bedroom Light", "on_off": True, "hue": hue, "saturation": saturation, "value": value, "return_topic": "debug_topic"})
+		print("\n---Cycle Completed---\n")
 
-	def __descend(self, seconds, initial, end, inc, red, green, blue):
-		# Calculate
-		sleep = seconds / (initial / inc)
-		brightness = initial / 100
-		increment = inc / 100
-		print(f"  - DESCENDING: sleep {sleep} brightness {brightness} increment {increment}")
-
+	def __descend(self, duration, increment, red, green, blue):
+		# Calculate HSV values
 		hue, saturation, value = colorsys.rgb_to_hsv(red/255.0, green/255.0, blue/255.0)
-		self.set_status({ "event_type": "control", "name": "Bedroom Light", "on_off": True, "hue": hue, "saturation": saturation, "value": value, "brightness_level":  brightness, "return_topic": "debug_topic"})
-		time.sleep(sleep)
+
+		# Calculate
+		loop = round(value * 100/increment)
+		sleep = duration / loop
+		print(f"  - DESCENDING: Start Value: {value} Loop: {loop}, Inc: {increment} Sleep: {sleep}")
+
 		# Loop
-		for count in range(1, initial, inc):
-			print(f"  - Counter for {initial - count} for {self.name}")
-			self.set_status({ "event_type": "control", "name": "Bedroom Light", "on_off": True, "hue": hue, "saturation": saturation, "value": brightness - (count * increment), "brightness_level":  (count * increment), "return_topic": "debug_topic"})
+		for count in range(0, loop, 1):
+			print("\n---Next Cycle---")
+			print(f"  - Counter for {100 - count} for {self.name}")
+			self.set_status({ "event_type": "control", "name": "Bedroom Light", "on_off": True, "hue": hue, "saturation": saturation, "value": round(value - (count * (increment/100)), 2), "return_topic": "debug_topic"})
 			time.sleep(sleep)
 		# Turn off the light
+		print("  - Turn off")
 		self.set_status({ "event_type": "control", "name": "Bedroom Light", "on_off": False, "red": -1, "green": -1, "blue": -1, "brightness_level":  0, "return_topic": "debug_topic"})
+		print("\n---Cycle Completed---\n")
 
 	def __set_status(self, control_dictionary):
 		if 'cycle' in control_dictionary:
 			print(f"  - cycle found for {self.name}")
 			if "descend" == control_dictionary['cycle']:
-				self.__descend(control_dictionary['seconds'], control_dictionary['initial'], 0, control_dictionary['increment'], control_dictionary['red'], control_dictionary['green'], control_dictionary['blue'])
+				self.__descend(control_dictionary['duration'], control_dictionary['increment'], control_dictionary['red'], control_dictionary['green'], control_dictionary['blue'])
 			elif "ascend" == control_dictionary['cycle']:
-				self.__ascend(control_dictionary['seconds'], 100, control_dictionary['initial'], control_dictionary['increment'], control_dictionary['red'], control_dictionary['green'], control_dictionary['blue'])
+				self.__ascend(control_dictionary['duration'], control_dictionary['increment'], control_dictionary['red'], control_dictionary['green'], control_dictionary['blue'])
 		elif control_dictionary['on_off'] == None: # If value is None Flip from current status
 			self.flip()
 		else:
