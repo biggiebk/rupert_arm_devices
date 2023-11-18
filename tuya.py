@@ -178,12 +178,19 @@ class Light():
 		for count in range(1, loop, 1):
 			print("\n---Next Cycle---")
 			print(f"  - Counter for {count} for {self.name}")
-			self.set_status({ "event_type": "control", "name": "Bedroom Light", "on_off": True, "hue": hue, "saturation": saturation, "value": round((increment / 100) * (count), 2), "return_topic": "debug_topic"})
+			self.set_status({"name": "Bedroom Light", "on_off": True, "hue": hue, "saturation": saturation, "value": round((increment / 100) * (count), 2)})
 			time.sleep(sleep)
 
 		print("\n---Last one---")
-		self.set_status({ "event_type": "control", "name": "Bedroom Light", "on_off": True, "hue": hue, "saturation": saturation, "value": value, "return_topic": "debug_topic"})
+		self.set_status({"name": "Bedroom Light", "on_off": True, "hue": hue, "saturation": saturation, "value": value})
 		print("\n---Cycle Completed---\n")
+
+	def __custom(self, name):
+		# Open cycle file
+
+		# Loop through 
+			# d
+		pass
 
 	def __descend(self, duration, increment, hue, saturation, value):
 
@@ -196,11 +203,11 @@ class Light():
 		for count in range(0, loop, 1):
 			print("\n---Next Cycle---")
 			print(f"  - Counter for {100 - count} for {self.name}")
-			self.set_status({ "event_type": "control", "name": "Bedroom Light", "on_off": True, "hue": hue, "saturation": saturation, "value": round(value - (count * (increment/100)), 2), "return_topic": "debug_topic"})
+			self.set_status({ "name": "Bedroom Light", "on_off": True, "hue": hue, "saturation": saturation, "value": round(value - (count * (increment/100)), 2)})
 			time.sleep(sleep)
 		# Turn off the light
 		print("\n---Turn off---")
-		self.set_status({ "event_type": "control", "name": "Bedroom Light", "on_off": False, "return_topic": "debug_topic"})
+		self.set_status({ "name": "Bedroom Light", "on_off": False})
 		print("\n---Cycle Completed---\n")
 
 	def __set_status(self, control_dictionary):
@@ -212,12 +219,14 @@ class Light():
 			# Remove red, green, blue
 			del control_dictionary['red'], control_dictionary['green'], control_dictionary['blue']
 
-		if 'cycle' in control_dictionary:
+		if 'cycle' in control_dictionary: # If it's a cycle/script
 			print(f"  - cycle found for {self.name}")
 			if "descend" == control_dictionary['cycle']:
 				self.__descend(control_dictionary['duration'], control_dictionary['increment'], control_dictionary['hue'], control_dictionary['saturation'], control_dictionary['value'])
 			elif "ascend" == control_dictionary['cycle']:
 				self.__ascend(control_dictionary['duration'], control_dictionary['increment'], control_dictionary['hue'], control_dictionary['saturation'], control_dictionary['value'])
+			elif "custom" == control_dictionary['cycle']:
+				self.__custom(control_dictionary['name'])
 		elif control_dictionary['on_off'] == None: # If value is None Flip from current status
 			self.flip()
 		else:
