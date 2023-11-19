@@ -7,11 +7,6 @@
 		{ "on_off": true, "brightness_level": 50, "colour_temp": 5, "sleep": 60 },
 		{ "on_off": true, "brightness_level": 75, "colour_temp": 5, "sleep": 60 },
 		{ "on_off": true, "brightness_level": 100, "colour_temp": 5, "sleep": 60 },
-		{ "on_off": false, "colour_temp": 5, "sleep": 1 },
-		{ "on_off": true, "brightness_level": 100, "colour_temp": 5, "sleep": 1 },
-		{ "on_off": false, "colour_temp": 5, "sleep": 1 },
-		{ "on_off": true, "brightness_level": 100, "colour_temp": 5, "sleep": 1 },
-		{ "on_off": false, "colour_temp": 5, "sleep": 1 },
-		{ "on_off": true, "brightness_level": 100, "colour_temp": 5, "sleep": 1 }
+		{ "cycle": "wink", "times": 5, "sleep": 0, "leave_on": true }
 	]
 }

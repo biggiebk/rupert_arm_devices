@@ -199,8 +199,8 @@ class Light():
 				self.set_status(turn)
 				time.sleep(turn['sleep'])
 			count += 1
-		if not cycle['leave_on']:
-			self.set_status({ "on_off": False})
+		if cycle['leave_on']:
+			self.set_status({ "on_off": True})
 
 	def __descend(self, duration, increment, hue, saturation, value):
 
@@ -235,6 +235,8 @@ class Light():
 				self.__descend(control_dictionary['duration'], control_dictionary['increment'], control_dictionary['hue'], control_dictionary['saturation'], control_dictionary['value'])
 			elif "ascend" == control_dictionary['cycle']:
 				self.__ascend(control_dictionary['duration'], control_dictionary['increment'], control_dictionary['hue'], control_dictionary['saturation'], control_dictionary['value'])
+			elif "wink" == control_dictionary['cycle']:
+				self.__wink(control_dictionary['times'], control_dictionary['leave_on'])
 			elif "custom" == control_dictionary['cycle']:
 				self.__custom(control_dictionary['cycle_name'])
 		elif control_dictionary['on_off'] == None: # If value is None Flip from current status
@@ -254,3 +256,13 @@ class Light():
 				elif 'colour_temp' in control_dictionary :
 					print("  - Setting colour temperature")
 					self.temperature(control_dictionary['colour_temp'])
+
+	def __wink(self, times, leave_on):
+
+		for _ in range(times):
+			self.set_status({ "on_off": True })
+			time.sleep(1)
+			self.set_status({ "on_off": False })
+			time.sleep(1)
+		if leave_on:
+			self.set_status({ "on_off": True})

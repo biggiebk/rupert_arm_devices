@@ -1,0 +1,12 @@
+{
+	"loop": 1,
+	"leave_on": true,
+	"turns": [
+		{ "cycle": "ascend", "red": 255, "green": 42, "blue": 0, "duration": 100, "increment": 1, "sleep": 30 },
+		{ "on_off": true, "brightness_level": 25, "colour_temp": 5, "sleep": 5 },
+		{ "on_off": true, "brightness_level": 50, "colour_temp": 5, "sleep": 5 },
+		{ "on_off": true, "brightness_level": 75, "colour_temp": 5, "sleep": 5 },
+		{ "on_off": true, "brightness_level": 100, "colour_temp": 5, "sleep": 5 },
+		{ "cycle": "wink", "times": 5, "sleep": 0, "leave_on": true }
+	]
+}
