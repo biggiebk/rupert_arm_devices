@@ -241,17 +241,16 @@ class Light():
 			self.flip()
 		else:
 			self.on_off(control_dictionary['on_off'])
-			# If light is powered off return
-			if not eval(f"control_dictionary['on_off']"): # Convert to boolean, however also accept as boolean.:
-				return
-			if all(key in control_dictionary for key in ('hue', 'saturation', 'value')): # If setting color
-				self.color_hsv(control_dictionary['hue'], control_dictionary['saturation'], control_dictionary['value'])
+			# If light is powered on
+			if eval(f"{control_dictionary['on_off']}"): # Convert to boolean, however also accept as boolean.:
+				if all(key in control_dictionary for key in ('hue', 'saturation', 'value')): # If setting color
+					self.color_hsv(control_dictionary['hue'], control_dictionary['saturation'], control_dictionary['value'])
 			
-			if all(key in control_dictionary for key in ('brightness_level', 'colour_temp')):
-				self.white(control_dictionary['brightness_level'], control_dictionary['colour_temp'])
-			elif 'brightness_level' in control_dictionary:
-				print("  - Setting brightness")
-				self.brightness(control_dictionary['brightness_level'])
-			elif 'colour_temp' in control_dictionary :
-				print("  - Setting colour temperature")
-				self.temperature(control_dictionary['colour_temp'])
+				if all(key in control_dictionary for key in ('brightness_level', 'colour_temp')):
+					self.white(control_dictionary['brightness_level'], control_dictionary['colour_temp'])
+				elif 'brightness_level' in control_dictionary:
+					print("  - Setting brightness")
+					self.brightness(control_dictionary['brightness_level'])
+				elif 'colour_temp' in control_dictionary :
+					print("  - Setting colour temperature")
+					self.temperature(control_dictionary['colour_temp'])
