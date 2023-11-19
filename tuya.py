@@ -164,7 +164,7 @@ class Light():
 
 	def white(self, brightness, temprature):
 		print(f"  - white to {brightness}/{temprature} on {self.name}")
-		self.tiny_tuya.set_colourtemp_percentage(brightness, temprature)
+		self.tiny_tuya.set_white_percentage(brightness, temprature)
 
 ## Private Classes
 	def __ascend(self, duration, increment, hue, saturation, value):
@@ -186,11 +186,21 @@ class Light():
 		print("\n---Cycle Completed---\n")
 
 	def __custom(self, name):
+		print(f"  - Starting cycle {name}")
 		# Open cycle file
-
-		# Loop through 
-			# d
-		pass
+		with open(f"cycles/{name}.json", 'r', encoding='utf-8') as cycle_file:
+			cycle_json = cycle_file.read()
+		cycle = json.loads(cycle_json)
+		# Loop through
+		count = 1
+		while(count <= cycle['loop'] or cycle['loop'] == 0):
+			print(f"  - Running loop: {count}")
+			for turn in cycle["turns"]:
+				self.set_status(turn)
+				time.sleep(turn['sleep'])
+			count += 1
+		if not cycle['leave_on']:
+			self.set_status({ "on_off": False})
 
 	def __descend(self, duration, increment, hue, saturation, value):
 
@@ -226,7 +236,7 @@ class Light():
 			elif "ascend" == control_dictionary['cycle']:
 				self.__ascend(control_dictionary['duration'], control_dictionary['increment'], control_dictionary['hue'], control_dictionary['saturation'], control_dictionary['value'])
 			elif "custom" == control_dictionary['cycle']:
-				self.__custom(control_dictionary['name'])
+				self.__custom(control_dictionary['cycle_name'])
 		elif control_dictionary['on_off'] == None: # If value is None Flip from current status
 			self.flip()
 		else:

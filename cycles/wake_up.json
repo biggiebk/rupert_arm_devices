@@ -1,0 +1,17 @@
+{
+	"loop": 1,
+	"leave_on": true,
+	"turns": [
+		{ "cycle": "ascend", "red": 255, "green": 42, "blue": 0, "duration": 600, "increment": 1, "sleep": 300 },
+		{ "on_off": true, "brightness_level": 25, "colour_temp": 5, "sleep": 60 },
+		{ "on_off": true, "brightness_level": 50, "colour_temp": 5, "sleep": 60 },
+		{ "on_off": true, "brightness_level": 75, "colour_temp": 5, "sleep": 60 },
+		{ "on_off": true, "brightness_level": 100, "colour_temp": 5, "sleep": 60 },
+		{ "on_off": false, "colour_temp": 5, "sleep": 1 },
+		{ "on_off": true, "brightness_level": 100, "colour_temp": 5, "sleep": 1 },
+		{ "on_off": false, "colour_temp": 5, "sleep": 1 },
+		{ "on_off": true, "brightness_level": 100, "colour_temp": 5, "sleep": 1 },
+		{ "on_off": false, "colour_temp": 5, "sleep": 1 },
+		{ "on_off": true, "brightness_level": 100, "colour_temp": 5, "sleep": 1 }
+	]
+}

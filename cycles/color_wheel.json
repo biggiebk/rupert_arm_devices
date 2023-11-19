@@ -1,0 +1,9 @@
+{
+	"loop": 2,
+	"leave_on": false,
+	"turns": [
+		{ "on_off": true, "red": 255, "green": 0, "blue": 0, "sleep": 10},
+		{ "on_off": true, "red": 0, "green": 255, "blue": 0, "sleep": 10},
+		{ "on_off": true, "red": 0, "green": 0, "blue": 255, "sleep": 10}
+	]
+}
