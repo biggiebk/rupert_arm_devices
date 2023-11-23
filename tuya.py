@@ -139,7 +139,8 @@ class Light():
 			self.tiny_tuya.turn_on()
 		else:
 			print("  - Turing off")
-			self.tiny_tuya.turn_off()
+			status = self.tiny_tuya.turn_off()
+			print(status)
 
 	def set_status(self, control_dictionary):
 		"""
@@ -213,7 +214,7 @@ class Light():
 		for count in range(0, loop, 1):
 			print("\n---Next Cycle---")
 			print(f"  - Counter for {100 - count} for {self.name}")
-			self.set_status({ "name": "Bedroom Light", "on_off": True, "hue": hue, "saturation": saturation, "value": round(value - (count * (increment/100)), 2)})
+			self.set_status({ "name": "Bedroom Light", "on_off": True, "hue": hue, "saturation": saturation, "value": round(value - (count * (increment/100)), 3)})
 			time.sleep(sleep)
 		# Turn off the light
 		print("\n---Turn off---")
