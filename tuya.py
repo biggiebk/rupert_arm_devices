@@ -177,7 +177,7 @@ class Light():
 
 		# Loop
 		for count in range(1, loop, 1):
-			print("\n---Next Cycle---")
+			print("\n---Next Trun---")
 			print(f"  - Counter for {count} for {self.name}")
 			self.set_status({"name": "Bedroom Light", "on_off": True, "hue": hue, "saturation": saturation, "value": round((increment / 100) * (count), 2)})
 			time.sleep(sleep)
@@ -197,6 +197,7 @@ class Light():
 		while(count <= cycle['loop'] or cycle['loop'] == 0):
 			print(f"  - Running loop: {count}")
 			for turn in cycle["turns"]:
+				print("  - Running turn")
 				self.set_status(turn)
 				time.sleep(turn['sleep'])
 			count += 1
@@ -231,7 +232,7 @@ class Light():
 			del control_dictionary['red'], control_dictionary['green'], control_dictionary['blue']
 
 		if 'cycle' in control_dictionary: # If it's a cycle/script
-			print(f"  - cycle found for {self.name}")
+			print(f"  - Starting Cycle {control_dictionary['cycle']} on {self.name}")
 			if "descend" == control_dictionary['cycle']:
 				self.__descend(control_dictionary['duration'], control_dictionary['increment'], control_dictionary['hue'], control_dictionary['saturation'], control_dictionary['value'])
 			elif "ascend" == control_dictionary['cycle']:
@@ -239,8 +240,9 @@ class Light():
 			elif "wink" == control_dictionary['cycle']:
 				self.__wink(control_dictionary['times'], control_dictionary['leave_on'])
 			elif "custom" == control_dictionary['cycle']:
+				print(f"  - Custom Cycle: {control_dictionary['cycle_name']}")
 				self.__custom(control_dictionary['cycle_name'])
-		elif control_dictionary['on_off'] == None: # If value is None Flip from current status
+		elif control_dictionary['on_off'] == 'None': # If value is None Flip from current status
 			self.flip()
 		else:
 			self.on_off(control_dictionary['on_off'])
