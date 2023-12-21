@@ -171,19 +171,21 @@ class Light():
 	def __ascend(self, duration, increment, hue, saturation, value):
 
 		# Calculate
-		loop = round(value * 100/increment)
+		loop = round(100/increment)
 		sleep = duration / loop
 		print(f"  - Ascending: End Value: {value} Loop: {loop}, Inc: {increment} Sleep: {sleep}")
 
+		self.set_status({"name": "BR Light", "on_off": True, "hue": hue, "saturation": saturation, "value": value})
+		self.set_status({"name": "BR Light", "on_off": True, "brightness_level":  1})
 		# Loop
 		for count in range(1, loop, 1):
 			print("\n---Next Trun---")
 			print(f"  - Counter for {count} for {self.name}")
-			self.set_status({"name": "Bedroom Light", "on_off": True, "hue": hue, "saturation": saturation, "value": round((increment / 100) * (count), 2)})
+			self.set_status({"name": "BR Light", "on_off": True, "brightness_level":  round(increment * count, 3)})
 			time.sleep(sleep)
 
 		print("\n---Last one---")
-		self.set_status({"name": "Bedroom Light", "on_off": True, "hue": hue, "saturation": saturation, "value": value})
+		self.set_status({"name": "BR Light", "on_off": True, "brightness_level":  100})
 		print("\n---Cycle Completed---\n")
 
 	def __custom(self, name):
@@ -207,19 +209,20 @@ class Light():
 	def __descend(self, duration, increment, hue, saturation, value):
 
 		# Calculate
-		loop = round(value * 100/increment)
+		loop = round(100/increment)
 		sleep = duration / loop
 		print(f"  - DESCENDING: Start Value: {value} Loop: {loop}, Inc: {increment} Sleep: {sleep}")
+		self.set_status({"name": "BR Light", "on_off": True, "hue": hue, "saturation": saturation, "value": value})
 
 		# Loop
 		for count in range(0, loop, 1):
 			print("\n---Next Cycle---")
 			print(f"  - Counter for {100 - count} for {self.name}")
-			self.set_status({ "name": "Bedroom Light", "on_off": True, "hue": hue, "saturation": saturation, "value": round(value - (count * (increment/100)), 3)})
+			self.set_status({ "name": "BR Light", "on_off": True, "brightness_level": round(100 - (count * increment), 3)})
 			time.sleep(sleep)
 		# Turn off the light
 		print("\n---Turn off---")
-		self.set_status({ "name": "Bedroom Light", "on_off": False})
+		self.set_status({ "name": "BR Light", "on_off": False})
 		print("\n---Cycle Completed---\n")
 
 	def __set_status(self, control_dictionary):
